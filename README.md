@@ -6,7 +6,7 @@ Checks if the server(s) are draining (not allowed connections) and activate the 
 Check service state : 
 - RemoteApp Connections Administration and Remote Desktop Services
 - Internal Windows database (WID)
-- Service Broker for remote desktop connections
+- Service Broker for remote desktop connections<br><br>
 
 **-- Setup --**
 
@@ -18,7 +18,7 @@ Check service state :
 - ServerActive="IP or DNS Zabbix Server"<br>
 - UserParameter=broker[*],powershell -NoProfile -ExecutionPolicy Bypass -File "C:\Program Files\Zabbix Agent\scripts\zabbix_broker.ps1" "$1" "$2"<br>
 - Import TemplateRdsCollections.xml file into Zabbix.<br>
-- Associate "Template RDS Collections" to the host.<br>
+- Associate "Template RDS Collections" to the host.<br><br>
 
-Template is in french.
+Template is in french.<br>
 Template for zabbix 3.4.X (please modify template for work on older versions)
