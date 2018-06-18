@@ -19,3 +19,6 @@ Check service state :
 - UserParameter=broker[*],powershell -NoProfile -ExecutionPolicy Bypass -File "C:\Program Files\Zabbix Agent\scripts\zabbix_broker.ps1" "$1" "$2"<br>
 - Import TemplateRdsCollections.xml file into Zabbix.<br>
 - Associate "Template RDS Collections" to the host.<br>
+
+Template is in french.
+Template for zabbix 3.4.X (please modify template for work on older versions)
