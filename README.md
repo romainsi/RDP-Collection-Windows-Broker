@@ -16,6 +16,6 @@ Check service state :
 - EnableRemoteCommands=1 <br>
 - UnsafeUserParameters=1 <br>
 - ServerActive="IP or DNS Zabbix Server"<br>
-- UserParameter=broker[*],powershell -NoProfile -ExecutionPolicy Bypass -File "C:\Program Files\Zabbix Agent\scripts\zabbix_broker.ps1" "$1" "$2" "$3"<br>
+- UserParameter=broker[*],powershell -NoProfile -ExecutionPolicy Bypass -File "C:\Program Files\Zabbix Agent\scripts\zabbix_broker.ps1" "$1" "$2"<br>
 - Import TemplateRdsCollections.xml file into Zabbix.<br>
 - Associate "Template RDS Collections" to the host.<br>
