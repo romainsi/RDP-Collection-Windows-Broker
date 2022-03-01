@@ -1,0 +1,647 @@
+zabbix_export:
+  version: '5.4'
+  date: '2022-03-01T08:14:40Z'
+  groups:
+    -
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Templates/Applications
+  templates:
+    -
+      uuid: ae5e1a767a0842f8ada1b6c275578839
+      template: 'Template App Windows Broker'
+      name: 'Template App Windows Broker'
+      groups:
+        -
+          name: Templates/Applications
+      items:
+        -
+          uuid: a1f0a861a4da4b9d89b3b7f9024557c8
+          name: 'Broker Results'
+          type: TRAP
+          key: ResultsBroker
+          delay: '0'
+          trends: '0'
+          value_type: TEXT
+          preprocessing:
+            -
+              type: TRIM
+              parameters:
+                - '"'
+          tags:
+            -
+              tag: Application
+              value: 'Master Item Broker'
+        -
+          uuid: c64944344d8d415cbc2fb3ba6ea29a8d
+          name: 'Base de données interne Windows'
+          key: 'service.info[MSSQL$MICROSOFT##WID]'
+          history: 20d
+          request_method: POST
+          tags:
+            -
+              tag: Application
+              value: Broker
+          triggers:
+            -
+              uuid: e5965ec2223746a1ab649910b73fcd42
+              expression: 'last(/Template App Windows Broker/service.info[MSSQL$MICROSOFT##WID])=6'
+              name: 'Service BDD Interne (WID) Arrêté'
+              priority: HIGH
+        -
+          uuid: a2c35467d5a5490ba0795365fbab58c6
+          name: 'Administration connexions RemoteApp et services Bureau à distance'
+          key: 'service.info[TScPubRPC]'
+          history: 20d
+          valuemap:
+            name: 'Windows service state'
+          request_method: POST
+          tags:
+            -
+              tag: Application
+              value: Broker
+          triggers:
+            -
+              uuid: 02d2beb63add4f3b8c004322e0582f8c
+              expression: 'last(/Template App Windows Broker/service.info[TScPubRPC])=6'
+              name: 'Service Administration connexions RemoteApp et services Bureau à distance Arrêté'
+              priority: HIGH
+        -
+          uuid: ff9443c1138840c6a619d7b25a6e4862
+          name: 'Service Broker pour les connexions Bureau à distance'
+          key: 'service.info[Tssdis]'
+          history: 20d
+          valuemap:
+            name: 'Windows service state'
+          request_method: POST
+          tags:
+            -
+              tag: Application
+              value: Broker
+          triggers:
+            -
+              uuid: 522d0fbcf45441aaa53a5898eb3daa9b
+              expression: 'last(/Template App Windows Broker/service.info[Tssdis])=6'
+              name: 'Service Broker Arrêté'
+              priority: HIGH
+        -
+          uuid: 63481603aff34bfbb05f3223ec54316f
+          name: 'Start Broker Job'
+          key: 'system.run[powershell -NoProfile -ExecutionPolicy Bypass -File "C:\Program Files\Zabbix Agent 2\scripts\zabbix_broker.ps1",nowait]'
+          delay: 2m
+          history: '0'
+          trends: '0'
+          tags:
+            -
+              tag: Application
+              value: 'Master Item Broker'
+      discovery_rules:
+        -
+          uuid: 8954154d3565427d8e223103d743636d
+          name: 'Results Broker'
+          type: DEPENDENT
+          key: Discovery.Broker.Results
+          delay: '0'
+          lifetime: 2h
+          item_prototypes:
+            -
+              uuid: 4a932d6a50624bbcac359e8d6ae25913
+              name: 'Utilisation NLA pour la connection : {#COLLECTIONNAME} : {#SESSIONHOST}'
+              type: DEPENDENT
+              key: 'broker[AuthenticateUsingNLA,{#COLLECTIONNAME},{#SESSIONHOST}]'
+              delay: '0'
+              trends: '0'
+              value_type: TEXT
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.CollectionName == "{#COLLECTIONNAME}")]'
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.SessionHost == "{#SESSIONHOST}")].AuthenticateUsingNLA'
+                -
+                  type: STR_REPLACE
+                  parameters:
+                    - '['
+                    - ''
+                -
+                  type: STR_REPLACE
+                  parameters:
+                    - ']'
+                    - ''
+              master_item:
+                key: ResultsBroker
+              tags:
+                -
+                  tag: Application
+                  value: 'Config Broker'
+            -
+              uuid: 8ed3255a4566412da33565f05c9330c5
+              name: 'Reconnexion automatique : {#COLLECTIONNAME} : {#SESSIONHOST}'
+              type: DEPENDENT
+              key: 'broker[AutomaticReconnectionEnabled,{#COLLECTIONNAME},{#SESSIONHOST}]'
+              delay: '0'
+              trends: '0'
+              value_type: TEXT
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.CollectionName == "{#COLLECTIONNAME}")]'
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.SessionHost == "{#SESSIONHOST}")].AutomaticReconnectionEnabled'
+                -
+                  type: STR_REPLACE
+                  parameters:
+                    - '['
+                    - ''
+                -
+                  type: STR_REPLACE
+                  parameters:
+                    - ']'
+                    - ''
+              master_item:
+                key: ResultsBroker
+              tags:
+                -
+                  tag: Application
+                  value: 'Config Broker'
+            -
+              uuid: e358f417080f4fb591a0ccc440f9650a
+              name: 'Redirection pour les entités suivantes : {#COLLECTIONNAME} : {#SESSIONHOST}'
+              type: DEPENDENT
+              key: 'broker[ClientDeviceRedirectionOptions,{#COLLECTIONNAME},{#SESSIONHOST}]'
+              delay: '0'
+              trends: '0'
+              value_type: TEXT
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.CollectionName == "{#COLLECTIONNAME}")]'
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.SessionHost == "{#SESSIONHOST}")].ClientDeviceRedirectionOptions'
+                -
+                  type: STR_REPLACE
+                  parameters:
+                    - '['
+                    - ''
+                -
+                  type: STR_REPLACE
+                  parameters:
+                    - ']'
+                    - ''
+              master_item:
+                key: ResultsBroker
+              tags:
+                -
+                  tag: Application
+                  value: 'Config Broker'
+            -
+              uuid: b10a17ed3e6f49b7b468ad32bbefc216
+              name: 'Utiliser le périphérique d''impression par défaut du client : {#COLLECTIONNAME} : {#SESSIONHOST}'
+              type: DEPENDENT
+              key: 'broker[ClientPrinterAsDefault,{#COLLECTIONNAME},{#SESSIONHOST}]'
+              delay: '0'
+              trends: '0'
+              value_type: TEXT
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.CollectionName == "{#COLLECTIONNAME}")]'
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.SessionHost == "{#SESSIONHOST}")].ClientPrinterAsDefault'
+                -
+                  type: STR_REPLACE
+                  parameters:
+                    - '['
+                    - ''
+                -
+                  type: STR_REPLACE
+                  parameters:
+                    - ']'
+                    - ''
+              master_item:
+                key: ResultsBroker
+              tags:
+                -
+                  tag: Application
+                  value: 'Config Broker'
+            -
+              uuid: 7d8faff395074621af928f8297395a6e
+              name: 'Autoriser la redirection d''imprimante : {#COLLECTIONNAME} : {#SESSIONHOST}'
+              type: DEPENDENT
+              key: 'broker[ClientPrinterRedirected,{#COLLECTIONNAME},{#SESSIONHOST}]'
+              delay: '0'
+              trends: '0'
+              value_type: TEXT
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.CollectionName == "{#COLLECTIONNAME}")]'
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.SessionHost == "{#SESSIONHOST}")].ClientPrinterRedirected'
+                -
+                  type: STR_REPLACE
+                  parameters:
+                    - '['
+                    - ''
+                -
+                  type: STR_REPLACE
+                  parameters:
+                    - ']'
+                    - ''
+              master_item:
+                key: ResultsBroker
+              tags:
+                -
+                  tag: Application
+                  value: 'Config Broker'
+            -
+              uuid: 348b22000f6c429684b20a421acc12b5
+              name: 'Niveau de chiffrement : {#COLLECTIONNAME} : {#SESSIONHOST}'
+              type: DEPENDENT
+              key: 'broker[EncryptionLevel,{#COLLECTIONNAME},{#SESSIONHOST}]'
+              delay: '0'
+              trends: '0'
+              value_type: TEXT
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.CollectionName == "{#COLLECTIONNAME}")]'
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.SessionHost == "{#SESSIONHOST}")].EncryptionLevel'
+                -
+                  type: STR_REPLACE
+                  parameters:
+                    - '['
+                    - ''
+                -
+                  type: STR_REPLACE
+                  parameters:
+                    - ']'
+                    - ''
+              master_item:
+                key: ResultsBroker
+              tags:
+                -
+                  tag: Application
+                  value: 'Config Broker'
+            -
+              uuid: 9b967a5c9b7d41c5b1c0c520864251e5
+              name: 'Nouvelle connexion autorisée : {#COLLECTIONNAME} : {#SESSIONHOST}'
+              type: DEPENDENT
+              key: 'broker[NewConnectionAllowed,{#COLLECTIONNAME},{#SESSIONHOST}]'
+              delay: '0'
+              trends: '0'
+              value_type: TEXT
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.CollectionName == "{#COLLECTIONNAME}")]'
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.SessionHost == "{#SESSIONHOST}")].NewConnectionAllowed'
+                -
+                  type: STR_REPLACE
+                  parameters:
+                    - '['
+                    - ''
+                -
+                  type: STR_REPLACE
+                  parameters:
+                    - ']'
+                    - ''
+              master_item:
+                key: ResultsBroker
+              tags:
+                -
+                  tag: Application
+                  value: 'Config Broker'
+              trigger_prototypes:
+                -
+                  uuid: a74fe66c7cd84d0695f310f3e514697b
+                  expression: 'last(/Template App Windows Broker/broker[NewConnectionAllowed,{#COLLECTIONNAME},{#SESSIONHOST}])<1'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'last(/Template App Windows Broker/broker[NewConnectionAllowed,{#COLLECTIONNAME},{#SESSIONHOST}])=1'
+                  name: 'Serveur {#SESSIONHOST} en drainage'
+                  priority: AVERAGE
+            -
+              uuid: e3d2c984e48641e390411b367f97bc62
+              name: 'Poid relatif : {#COLLECTIONNAME} : {#SESSIONHOST}'
+              type: DEPENDENT
+              key: 'broker[RelativeWeight,{#COLLECTIONNAME},{#SESSIONHOST}]'
+              delay: '0'
+              trends: '0'
+              value_type: TEXT
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.CollectionName == "{#COLLECTIONNAME}")]'
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.SessionHost == "{#SESSIONHOST}")].LoadBalancing'
+                -
+                  type: STR_REPLACE
+                  parameters:
+                    - '['
+                    - ''
+                -
+                  type: STR_REPLACE
+                  parameters:
+                    - ']'
+                    - ''
+              master_item:
+                key: ResultsBroker
+              tags:
+                -
+                  tag: Application
+                  value: 'Config Broker'
+              trigger_prototypes:
+                -
+                  uuid: 2e77788ad0d142b39a3d711c5db7b216
+                  expression: 'last(/Template App Windows Broker/broker[RelativeWeight,{#COLLECTIONNAME},{#SESSIONHOST}])<100'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'last(/Template App Windows Broker/broker[RelativeWeight,{#COLLECTIONNAME},{#SESSIONHOST}])=100'
+                  name: 'Serveur {#SESSIONHOST} poids relatif inférieur à 100'
+                  priority: AVERAGE
+            -
+              uuid: 0de8858e52dd4139adecc6dc400451da
+              name: 'Couche de sécurité : {#COLLECTIONNAME} : {#SESSIONHOST}'
+              type: DEPENDENT
+              key: 'broker[SecurityLayer,{#COLLECTIONNAME},{#SESSIONHOST}]'
+              delay: '0'
+              trends: '0'
+              value_type: TEXT
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.CollectionName == "{#COLLECTIONNAME}")]'
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.SessionHost == "{#SESSIONHOST}")].SecurityLayer'
+                -
+                  type: STR_REPLACE
+                  parameters:
+                    - '['
+                    - ''
+                -
+                  type: STR_REPLACE
+                  parameters:
+                    - ']'
+                    - ''
+              master_item:
+                key: ResultsBroker
+              tags:
+                -
+                  tag: Application
+                  value: 'Config Broker'
+            -
+              uuid: a89a3ae6a8b34cc0ab03c2b149e2cd07
+              name: 'Supprimer les dossiers temporaires en quittant : {#COLLECTIONNAME} : {#SESSIONHOST}'
+              type: DEPENDENT
+              key: 'broker[TemporaryFoldersDeletedOnExit,{#COLLECTIONNAME},{#SESSIONHOST}]'
+              delay: '0'
+              trends: '0'
+              value_type: TEXT
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.CollectionName == "{#COLLECTIONNAME}")]'
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.SessionHost == "{#SESSIONHOST}")].TemporaryFoldersDeletedOnExit'
+                -
+                  type: STR_REPLACE
+                  parameters:
+                    - '['
+                    - ''
+                -
+                  type: STR_REPLACE
+                  parameters:
+                    - ']'
+                    - ''
+              master_item:
+                key: ResultsBroker
+              tags:
+                -
+                  tag: Application
+                  value: 'Config Broker'
+            -
+              uuid: 017917042bf14fce8558917e423f9e48
+              name: 'Groupe AD connexion RDS : {#COLLECTIONNAME} : {#SESSIONHOST}'
+              type: DEPENDENT
+              key: 'broker[UserGroup,{#COLLECTIONNAME},{#SESSIONHOST}]'
+              delay: '0'
+              trends: '0'
+              status: DISABLED
+              discover: NO_DISCOVER
+              value_type: TEXT
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.CollectionName == "{#COLLECTIONNAME}")]'
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.SessionHost == "{#SESSIONHOST}")].UserGroup'
+                -
+                  type: STR_REPLACE
+                  parameters:
+                    - '['
+                    - ''
+                -
+                  type: STR_REPLACE
+                  parameters:
+                    - ']'
+                    - ''
+              master_item:
+                key: ResultsBroker
+              tags:
+                -
+                  tag: Application
+                  value: 'Config Broker'
+            -
+              uuid: 03917e467b08462aa67fae0ea2f036c1
+              name: 'Status UPD : {#COLLECTIONNAME} : {#SESSIONHOST}'
+              type: DEPENDENT
+              key: 'broker[UserProfileDisk,{#COLLECTIONNAME},{#SESSIONHOST}]'
+              delay: '0'
+              trends: '0'
+              value_type: TEXT
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.CollectionName == "{#COLLECTIONNAME}")]'
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.SessionHost == "{#SESSIONHOST}")].UserProfileDisk'
+                -
+                  type: STR_REPLACE
+                  parameters:
+                    - '['
+                    - ''
+                -
+                  type: STR_REPLACE
+                  parameters:
+                    - ']'
+                    - ''
+              master_item:
+                key: ResultsBroker
+              tags:
+                -
+                  tag: Application
+                  value: 'Config Broker'
+          master_item:
+            key: ResultsBroker
+          preprocessing:
+            -
+              type: STR_REPLACE
+              parameters:
+                - CollectionName
+                - '{#COLLECTIONNAME}'
+            -
+              type: STR_REPLACE
+              parameters:
+                - SessionHost
+                - '{#SESSIONHOST}'
+            -
+              type: STR_REPLACE
+              parameters:
+                - NewConnectionAllowed
+                - '{#NEWCONNECTIONALLOWED}'
+            -
+              type: STR_REPLACE
+              parameters:
+                - UserProfileDisk
+                - '{#USERPROFILEDISK}'
+            -
+              type: STR_REPLACE
+              parameters:
+                - UserGroup
+                - '{#USERGROUP}'
+            -
+              type: STR_REPLACE
+              parameters:
+                - DisconnectedSessionLimitMin
+                - '{#DISCONNECTEDSESSIONLIMITMIN}'
+            -
+              type: STR_REPLACE
+              parameters:
+                - IdleSessionLimitMin
+                - '{#IDLESESSIONLIMITMIN}'
+            -
+              type: STR_REPLACE
+              parameters:
+                - ActiveSessionLimitMin
+                - '{#ACTIVESESSIONLIMITMIN}'
+            -
+              type: STR_REPLACE
+              parameters:
+                - BrokenConnectionAction
+                - '{#BROKENCONNECTIONACTION}'
+            -
+              type: STR_REPLACE
+              parameters:
+                - AutomaticReconnectionEnabled
+                - '{#AUTOMATICRECONNECTIONENABLED}'
+            -
+              type: STR_REPLACE
+              parameters:
+                - TemporaryFoldersDeletedOnExit
+                - '{#TEMPORARYFOLDERSDELETEDONEXIT}'
+            -
+              type: STR_REPLACE
+              parameters:
+                - AuthenticateUsingNLA
+                - '{#AUTHENTICATEUSINGNLA}'
+            -
+              type: STR_REPLACE
+              parameters:
+                - EncryptionLevel
+                - '{#ENCRYPTIONLEVEL}'
+            -
+              type: STR_REPLACE
+              parameters:
+                - SecurityLayer
+                - '{#SECURITYLAYER}'
+            -
+              type: STR_REPLACE
+              parameters:
+                - LoadBalancing
+                - '{#LOADBALANCING}'
+            -
+              type: STR_REPLACE
+              parameters:
+                - ClientPrinterRedirected
+                - '{#CLIENTPRINTERREDIRECTED}'
+            -
+              type: STR_REPLACE
+              parameters:
+                - ClientPrinterAsDefault
+                - '{#CLIENTPRINTERASDEFAULT}'
+            -
+              type: STR_REPLACE
+              parameters:
+                - ClientDeviceRedirectionOptions
+                - '{#CLIENTDEVICEREDIRECTIONOPTIONS}'
+      macros:
+        -
+          macro: '{$GROUPBROKER}'
+      valuemaps:
+        -
+          uuid: 31849bbd990b444b8986cc20ae6c4bf6
+          name: 'Windows service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Running
+            -
+              value: '1'
+              newvalue: Paused
+            -
+              value: '3'
+              newvalue: 'Pause pending'
+            -
+              value: '4'
+              newvalue: 'Continue pending'
+            -
+              value: '5'
+              newvalue: 'Stop pending'
+            -
+              value: '6'
+              newvalue: Stopped
+            -
+              value: '7'
+              newvalue: Unknown
+            -
+              value: '255'
+              newvalue: 'No such service'
+            -
+              value: '2'
+              newvalue: 'Start pending'
