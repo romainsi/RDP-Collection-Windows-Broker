@@ -29,7 +29,7 @@ Check service state (disable it if you already use Template for discovery all wi
 - Install the Zabbix Agent2 (ajust script if you use classique zabbix_agentd) on your host<br>
 - Copy zabbix_broker.ps1 in the directory : "C:\Program Files\Zabbix Agent2\scripts" (create folder if not exist or ajust script)<br>
 - Add the following line to your Zabbix agent configuration file.<br>
-- EnableRemoteCommands=1 <br>
+- `AllowKey=system.run[*]` if you use agent2 or EnableRemoteCommands=1 with zabbixAgentd (or create userparameter and change zabbix item "Start Broker Job")<br>
 - UnsafeUserParameters=1 (probably not necessary) <br>
 - ServerActive="IP or DNS Zabbix Server"<br>
 - Import Template_App_Windows_Broker.yaml file into Zabbix.<br>
