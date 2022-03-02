@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2022-03-01T08:14:40Z'
+  date: '2022-03-02T14:56:20Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -20,6 +20,7 @@ zabbix_export:
           type: TRAP
           key: ResultsBroker
           delay: '0'
+          history: 1d
           trends: '0'
           value_type: TEXT
           preprocessing:
@@ -31,6 +32,12 @@ zabbix_export:
             -
               tag: Application
               value: 'Master Item Broker'
+          triggers:
+            -
+              uuid: e98b2a0c6d434bee80a0bc06db5a51ab
+              expression: 'nodata(/Template App Windows Broker/ResultsBroker,7200)=1'
+              name: 'No Data in Broker Results'
+              priority: AVERAGE
         -
           uuid: c64944344d8d415cbc2fb3ba6ea29a8d
           name: 'Base de données interne Windows'
